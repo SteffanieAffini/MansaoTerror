@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mansão Assombrada</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game">
+    <img id="scene" src="assets/saguao.jpg" alt="Cena atual" />
+    <div id="jumpscare"></div>
+    <audio id="audio" autoplay loop></audio>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+}
+#game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+#scene {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#jumpscare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('assets/jumpscare.png') center/cover no-repeat;
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 10;
+}
+const scenes = ["saguao", "corredor", "jantar"];
+const sounds = {
+  saguao: "vento.mp3",
+  corredor: "passos.mp3",
+  jantar: "porta.mp3",
+  jumpscare: "grito.mp3"
+};
+
+let current = parseInt(localStorage.getItem("sceneIndex") || 0);
+const sceneEl = document.getElementById("scene");
+const audioEl = document.getElementById("audio");
+const jumpscareEl = document.getElementById("jumpscare");
+
+function changeScene(idx) {
+  current = idx;
+  sceneEl.src = `assets/${scenes[current]}.jpg`;
+  audioEl.src = `assets/${sounds[scenes[current]]}`;
+  localStorage.setItem("sceneIndex", current);
+}
+
+function triggerJumpscare() {
+  jumpscareEl.style.opacity = 1;
+  const scream = new Audio(`assets/${sounds.jumpscare}`);
+  scream.play();
+  setTimeout(() => jumpscareEl.style.opacity = 0, 2000);
+}
+
+sceneEl.addEventListener("click", () => {
+  const next = (current + 1) % scenes.length;
+  changeScene(next);
+  if (Math.random() < 0.3) triggerJumpscare();
+});
+
+// Inicializa
+changeScene(current);
